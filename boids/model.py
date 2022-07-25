@@ -1,6 +1,7 @@
 import numpy as np
 
 from boids.utils import random_states
+from copy import deepcopy
 
 
 class Model:
@@ -22,15 +23,30 @@ class Model:
         # self.cohesion_distance = params['cohesion_distance']
         # self.x_bound = params['x_bound']
         # self.y_bound = params['y_bound']
-        # self.max_speed = params['max_speed']
-
-        self._new_b_positions = np.zeros((self.num_boids, 2), dtype=float)
-        self._new_b_velocities = np.zeros((self.num_boids, 2), dtype=float)
+        self.max_speed = params['max_speed']
 
     def update(self):
 
         # Dummy version
-        self._dummy_update()
+        dummy_diff = self._dummy_update()
+        diff = dummy_diff
+
+        velocities = deepcopy(self.boids_velocities) + diff
+        velocities = self._cut_off(velocities)
+        self.boids_positions += velocities
+        self.boids_velocities = velocities
 
     def _dummy_update(self): # TEMPORARY, REMOVE WHEN THE ACTUAL UPDATE EXISTS.
-        self.boids_positions += self.boids_velocities
+        return np.zeros((self.num_boids, 2), dtype=float)
+
+    def _cut_off(self, velocities):
+
+        def max_cut(velocity):
+            norm = np.linalg.norm(velocity)
+            if norm <= self.max_speed:
+                return velocity
+            else:
+                normalized = velocity/norm
+                return self.max_speed * normalized
+
+        return np.apply_along_axis(lambda v: max_cut(v), 1, velocities)

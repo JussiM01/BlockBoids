@@ -32,8 +32,9 @@ if __name__ == '__main__':
             'size_boids': args.size_boids,
             'color_boids': (0, 0, 0, 1),
         },
-        'model': {
+        'model': { # ADD (SOME OF) THESE TO ARGS
             'num_boids': 100,
+            'max_speed': 1e2,
             'ranges_boids': { # TEMPORARY. FIX THESE WHEN READY TO BE SET.
                 'x_pos_min': 0.25,
                 'x_pos_max': 0.5,
