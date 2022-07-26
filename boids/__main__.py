@@ -31,6 +31,10 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--margin', type=float, default=0.01)
     parser.add_argument('-avf', '--avoid_factor', type=float, default=1e-2)
 
+    parser.add_argument('-it', '--init_type', type=str, default='fixed_speed')
+    parser.add_argument('-xi', '--init_ratio', type=float, default=0.01)
+    parser.add_argument('-is', '--init_speed', type=float, default=1e-2)
+
     args = parser.parse_args()
 
     params = {
@@ -51,14 +55,12 @@ if __name__ == '__main__':
             'min_speed': args.max_speed * args.speed_ratio,
             'max_speed': args.max_speed,
             'ranges_boids': { # TEMPORARY. FIX THESE WHEN READY TO BE SET.
-                'x_pos_min': 0.25,
-                'x_pos_max': 0.5,
-                'x_pos_min': 0.25,
-                'x_pos_max': 0.5,
-                'x_vel_min': -0.25,
-                'x_vel_max': 0.25,
-                'x_vel_min': -0.25,
-                'x_vel_max': 0.25,
+                'init_type': args.init_type,
+                'x_pos_min': args.init_ratio * args.max_x_value,
+                'x_pos_max': (1 - args.init_ratio) * args.max_x_value,
+                'y_pos_min': args.init_ratio * args.max_y_value,
+                'y_pos_max': (1 - args.init_ratio) * args.max_y_value,
+                'init_speed': args.init_speed,
             },
 
         },
