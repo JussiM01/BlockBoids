@@ -21,8 +21,10 @@ class Model:
         # self.separation_distance = params['separation_distance']
         # self.alignment_distance = params['alignment_distance']
         # self.cohesion_distance = params['cohesion_distance']
-        # self.x_bound = params['x_bound']
-        # self.y_bound = params['y_bound']
+        self.x_bound = params['x_bound']
+        self.y_bound = params['y_bound']
+        self.margin = params['margin']
+        self.avoid_factor = params['avoid_factor']
         self.min_speed = params['min_speed']
         self.max_speed = params['max_speed']
 
@@ -32,6 +34,8 @@ class Model:
         dummy_diff = self._dummy_update()
         diff = dummy_diff
 
+        diff += self._avoid_boundary()
+
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
         self.boids_positions += velocities
@@ -39,6 +43,24 @@ class Model:
 
     def _dummy_update(self): # TEMPORARY, REMOVE WHEN THE ACTUAL UPDATE EXISTS.
         return np.zeros((self.num_boids, 2), dtype=float)
+
+    def _avoid_boundary(self):
+
+        xs = self.boids_positions[:,0]
+        ys = self.boids_positions[:,1]
+        xs_high = self.x_bound - xs
+        ys_high = self.y_bound - ys
+
+        diff_x_low = xs * (xs < self.margin).astype(float)
+        diff_y_low = ys * (ys < self.margin).astype(float)
+        diff_x_high = -1 * (xs_high * (xs_high < self.margin).astype(float))
+        diff_y_high = -1 * (ys_high * (ys_high < self.margin).astype(float))
+
+        avoid_diff_x = diff_x_low + diff_x_high
+        avoid_diff_y = diff_y_low + diff_y_high
+        avoid_diff = np.stack((avoid_diff_x, avoid_diff_y), axis=1)
+
+        return self.avoid_factor * avoid_diff
 
     def _cut_off(self, velocities):
 

@@ -21,7 +21,6 @@ class Animation:
         self.model.update()
         updated_boids_pos = self.model.boids_positions
         self.boids_scatter.set_offsets(updated_boids_pos)
-        print(self.model.boids_positions)
 
         return (self.boids_scatter,)
 
