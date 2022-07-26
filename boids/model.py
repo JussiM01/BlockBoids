@@ -23,6 +23,7 @@ class Model:
         # self.cohesion_distance = params['cohesion_distance']
         # self.x_bound = params['x_bound']
         # self.y_bound = params['y_bound']
+        self.min_speed = params['min_speed']
         self.max_speed = params['max_speed']
 
     def update(self):
@@ -41,12 +42,14 @@ class Model:
 
     def _cut_off(self, velocities):
 
-        def max_cut(velocity):
+        def cut(velocity):
             norm = np.linalg.norm(velocity)
-            if norm <= self.max_speed:
-                return velocity
-            else:
+            if norm < self.min_speed:
+                return self.min_speed * velocity/norm
+            elif norm > self.max_speed:
                 normalized = velocity/norm
-                return self.max_speed * normalized
+                return self.max_speed * velocity/norm
+            else:
+                return velocity
 
-        return np.apply_along_axis(lambda v: max_cut(v), 1, velocities)
+        return np.apply_along_axis(lambda v: cut(v), 1, velocities)

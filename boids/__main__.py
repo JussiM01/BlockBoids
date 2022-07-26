@@ -15,11 +15,17 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
+    # fig args
     parser.add_argument('-fx', '--fig_size_x', type=float, default=7.0)
     parser.add_argument('-fy', '--fig_size_y', type=float, default=7.0)
     parser.add_argument('-mx', '--max_x_value', type=float, default=1.0)
     parser.add_argument('-my', '--max_y_value', type=float, default=1.0)
     parser.add_argument('-sb', '--size_boids', type=int, default=10)
+
+    # model args
+    parser.add_argument('-nb', '--num_boids', type=int, default=100)
+    parser.add_argument('-sr', '--speed_ratio', type=float, default=0.5)
+    parser.add_argument('-ms', '--max_speed', type=float, default=1e-3)
 
     args = parser.parse_args()
 
@@ -32,9 +38,10 @@ if __name__ == '__main__':
             'size_boids': args.size_boids,
             'color_boids': (0, 0, 0, 1),
         },
-        'model': { # ADD (SOME OF) THESE TO ARGS
-            'num_boids': 100,
-            'max_speed': 1e2,
+        'model': {
+            'num_boids': args.num_boids,
+            'min_speed': args.max_speed * args.speed_ratio,
+            'max_speed': args.max_speed,
             'ranges_boids': { # TEMPORARY. FIX THESE WHEN READY TO BE SET.
                 'x_pos_min': 0.25,
                 'x_pos_max': 0.5,
