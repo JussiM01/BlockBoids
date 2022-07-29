@@ -30,19 +30,12 @@ class Model:
 
     def update(self):
 
-        # Dummy version
-        dummy_diff = self._dummy_update()
-        diff = dummy_diff
-
-        diff += self._avoid_boundary()
+        diff = self._avoid_boundary()
 
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
         self.boids_positions += velocities
         self.boids_velocities = velocities
-
-    def _dummy_update(self): # TEMPORARY, REMOVE WHEN THE ACTUAL UPDATE EXISTS.
-        return np.zeros((self.num_boids, 2), dtype=float)
 
     def _avoid_boundary(self):
 
