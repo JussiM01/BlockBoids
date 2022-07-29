@@ -36,6 +36,6 @@ def init_animation(params, boids_positions):
     ax.set_ylim(0, params['y_max']), ax.set_yticks([])
 
     boids_scatter = ax.scatter(boids_positions[:, 0], boids_positions[:, 1],
-        s=params['size_boids'], lw=0.5, c=params['color_boids'])
+        s=params['size_boids'], lw=0.5, c=np.array([params['color_boids']]))
 
     return fig, boids_scatter
