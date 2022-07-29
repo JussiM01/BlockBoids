@@ -12,8 +12,9 @@ def random_states(num_points, params):
         positions = np.stack((x_positions, y_positions), axis=1)
 
         thetas = np.random.uniform(0, 2*np.pi, num_points)
-        velocities = np.array([[np.cos(thetas[i]), np.sin(thetas[i])]
-            for i in range(num_points)], dtype=float)
+        velocities = params['init_speed'] * np.array(
+            [[np.cos(thetas[i]), np.sin(thetas[i])]
+             for i in range(num_points)], dtype=float)
 
     elif params['init_type'] == 'fixed_velocity':
         x_positions = np.random.uniform(
@@ -22,7 +23,16 @@ def random_states(num_points, params):
             params['y_pos_min'], params['y_pos_max'], num_points)
         positions = np.stack((x_positions, y_positions), axis=1)
 
-        velocities = 1e-3 * np.ones((num_points, 2), dtype=float)
+        init_direction = np.array(params['init_direction'], float)
+        norm = np.linalg.norm(init_direction)
+
+        if norm == 0:
+            raise ValueError('Args `init_direct_x` and `init_direct_y`'
+                ' are not allowed to be simultaniously zeros.')
+
+        normalized = init_direction / norm
+        velocities = params['init_speed'] * np.array(
+            [normalized for i in range(num_points)], dtype=float)
 
     return positions, velocities
 
@@ -36,6 +46,6 @@ def init_animation(params, boids_positions):
     ax.set_ylim(0, params['y_max']), ax.set_yticks([])
 
     boids_scatter = ax.scatter(boids_positions[:, 0], boids_positions[:, 1],
-        s=params['size_boids'], lw=0.5, c=params['color_boids'])
+        s=params['size_boids'], lw=0.5, c=np.array([params['color_boids']]))
 
     return fig, boids_scatter

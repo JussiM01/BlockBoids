@@ -30,37 +30,37 @@ class Model:
 
     def update(self):
 
-        # Dummy version
-        dummy_diff = self._dummy_update()
-        diff = dummy_diff
-
-        diff += self._avoid_boundary()
+        diff = self._avoid_boundary()
 
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
         self.boids_positions += velocities
         self.boids_velocities = velocities
 
-    def _dummy_update(self): # TEMPORARY, REMOVE WHEN THE ACTUAL UPDATE EXISTS.
-        return np.zeros((self.num_boids, 2), dtype=float)
-
     def _avoid_boundary(self):
 
+        turn_speed = self.avoid_factor * self.max_speed
         xs = self.boids_positions[:,0]
         ys = self.boids_positions[:,1]
-        xs_high = self.x_bound - xs
-        ys_high = self.y_bound - ys
+        xs_low = abs(self.boids_positions[:,0])
+        ys_low = abs(self.boids_positions[:,1])
+        xs_high = abs(self.x_bound - xs)
+        ys_high = abs(self.y_bound - ys)
 
-        diff_x_low = xs * (xs < self.margin).astype(float)
-        diff_y_low = ys * (ys < self.margin).astype(float)
-        diff_x_high = -1 * (xs_high * (xs_high < self.margin).astype(float))
-        diff_y_high = -1 * (ys_high * (ys_high < self.margin).astype(float))
+        diff_x_low = turn_speed * (
+            xs_low < self.margin * self.x_bound).astype(float)
+        diff_y_low = turn_speed * (
+            ys_low < self.margin * self.y_bound).astype(float)
+        diff_x_high = -1 * turn_speed * (
+            xs_high < self.margin * self.x_bound).astype(float)
+        diff_y_high = -1 * turn_speed * (
+            ys_high < self.margin * self.x_bound).astype(float)
 
         avoid_diff_x = diff_x_low + diff_x_high
         avoid_diff_y = diff_y_low + diff_y_high
         avoid_diff = np.stack((avoid_diff_x, avoid_diff_y), axis=1)
 
-        return self.avoid_factor * avoid_diff
+        return avoid_diff
 
     def _cut_off(self, velocities):
 
