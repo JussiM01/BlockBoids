@@ -34,6 +34,8 @@ if __name__ == '__main__':
     parser.add_argument('-it', '--init_type', type=str, default='fixed_speed')
     parser.add_argument('-ir', '--init_ratio', type=float, default=0.1)
     parser.add_argument('-is', '--init_speed', type=float, default=2.5)
+    parser.add_argument('-idx', '--init_direct_x', type=float, default=1.0)
+    parser.add_argument('-idy', '--init_direct_y', type=float, default=1.0)
 
     args = parser.parse_args()
 
@@ -61,6 +63,7 @@ if __name__ == '__main__':
                 'y_pos_min': args.init_ratio * args.max_y_value,
                 'y_pos_max': (1 - args.init_ratio) * args.max_y_value,
                 'init_speed': args.init_speed,
+                'init_direction': [args.init_direct_x, args.init_direct_y], # CHANGE LATER ? (only used with fixed_velocity)
             },
 
         },
