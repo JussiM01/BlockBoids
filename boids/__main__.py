@@ -26,10 +26,16 @@ if __name__ == '__main__':
 
     # model args
     parser.add_argument('-nb', '--num_boids', type=int, default=1000)
-    parser.add_argument('-sr', '--speed_ratio', type=float, default=0.5)
+    parser.add_argument('-spr', '--speed_ratio', type=float, default=0.5)
     parser.add_argument('-ms', '--max_speed', type=float, default=3.0)
     parser.add_argument('-m', '--margin', type=float, default=0.05)
     parser.add_argument('-avf', '--avoid_factor', type=float, default=0.02)
+    parser.add_argument('-cf', '--cohesion_factor', type=float, default=0.002)
+    parser.add_argument('-sf', '--separation_factor', type=float, default=0.02)
+    # parser.add_argument('-af', '--alingment_factor', type=float, default=0.02)
+    parser.add_argument('-cr', '--cohesion_ratio', type=float, default=0.02)
+    parser.add_argument('-sef','--separation_ratio', type=float, default=0.01)
+    # parser.add_argument('-af', '--alingment_ratio', type=float, default=0.02)
 
     parser.add_argument('-it', '--init_type', type=str, default='fixed_speed')
     parser.add_argument('-ir', '--init_ratio', type=float, default=0.1)
@@ -54,6 +60,10 @@ if __name__ == '__main__':
             'y_bound': args.max_y_value,
             'margin': args.margin,
             'avoid_factor': args.avoid_factor,
+            'cohesion_factor': args.cohesion_factor,
+            'cohesion_ratio': args.cohesion_ratio,
+            'separation_factor': args.separation_factor,
+            'separation_ratio': args.separation_ratio,
             'min_speed': args.max_speed * args.speed_ratio,
             'max_speed': args.max_speed,
             'ranges_boids': { # TEMPORARY. FIX THESE WHEN READY TO BE SET.
