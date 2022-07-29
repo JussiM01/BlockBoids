@@ -15,12 +15,12 @@ class Model:
         self.num_boids = params['num_boids']
         self.boids_positions = boids_positions
         self.boids_velocities = boids_velocities
-        # self.separation_scale = params['separation_scale']
-        # self.alignment_scale = params['alignment_scale']
-        # self.cohesion_scale = params['cohesion_scale']
-        # self.separation_distance = params['separation_distance']
+        self.separation_factor = params['separation_factor']
+        # self.alignment_factor = params['alignment_factor']
+        self.cohesion_factor = params['cohesion_factor']
+        self.separation_distance = params['separation_ratio'] * params['x_bound']
         # self.alignment_distance = params['alignment_distance']
-        # self.cohesion_distance = params['cohesion_distance']
+        self.cohesion_distance = params['cohesion_ratio'] * params['x_bound']
         self.x_bound = params['x_bound']
         self.y_bound = params['y_bound']
         self.margin = params['margin']
@@ -32,10 +32,35 @@ class Model:
 
         diff = self._avoid_boundary()
 
+        for i in range(self.num_boids):
+            position = self.boids_positions[i]
+            velocity = self.boids_velocities[i]
+            pos_rest = np.delete(self.boids_positions, i, axis=0)
+            vel_rest = np.delete(self.boids_velocities, i, axis=0)
+            diff[i,:] += self._cohesion(position, pos_rest)
+            # diff[i,:] += self._separation(position, pos_rest)
+            # diff[i,:] += self._alignment(velocity, vel_rest)
+
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
         self.boids_positions += velocities
         self.boids_velocities = velocities
+
+    def _cohesion(self, position, pos_rest):
+
+        close_indeces = np.where(
+            abs(pos_rest - position) < self.cohesion_distance)
+        mean = np.mean(pos_rest[close_indeces], axis=0)
+
+        return self.cohesion_factor * (mean -position)
+
+    def _separation(self, position, pos_rest):
+
+        close_indeces = np.where(
+            abs(pos_rest - position) < self.separation_distance)
+        mean = np.mean(pos_rest[close_indeces], axis=0)
+
+        return self.separation_factor * (position -mean)
 
     def _avoid_boundary(self):
 
