@@ -16,10 +16,10 @@ class Model:
         self.boids_positions = boids_positions
         self.boids_velocities = boids_velocities
         self.separation_factor = params['separation_factor']
-        # self.alignment_factor = params['alignment_factor']
+        self.alignment_factor = params['alignment_factor']
         self.cohesion_factor = params['cohesion_factor']
         self.separation_distance = params['separation_ratio'] * params['x_bound']
-        # self.alignment_distance = params['alignment_distance']
+        self.alignment_distance = params['alignment_ratio'] * params['x_bound']
         self.cohesion_distance = params['cohesion_ratio'] * params['x_bound']
         self.x_bound = params['x_bound']
         self.y_bound = params['y_bound']
@@ -35,32 +35,46 @@ class Model:
         for i in range(self.num_boids):
             position = self.boids_positions[i]
             velocity = self.boids_velocities[i]
-            pos_rest = np.delete(self.boids_positions, i, axis=0)
-            vel_rest = np.delete(self.boids_velocities, i, axis=0)
-            diff[i,:] += self._cohesion(position, pos_rest)
-            # diff[i,:] += self._separation(position, pos_rest)
-            # diff[i,:] += self._alignment(velocity, vel_rest)
+            pos_rest = np.delete(deepcopy(self.boids_positions), i, axis=0)
+            vel_rest = np.delete(deepcopy(self.boids_velocities), i, axis=0)
 
+            cohes_inds = np.where(np.linalg.norm(pos_rest -position, axis=1)
+                < self.cohesion_distance)[0]
+            separ_inds = np.where(np.linalg.norm(pos_rest -position, axis=1)
+                < self.separation_distance)[0]
+            align_inds = np.where(np.linalg.norm(pos_rest -position, axis=1)
+                < self.alignment_distance)[0]
+
+            if cohes_inds != []:
+                diff[i,:] += self._cohesion(position, pos_rest[cohes_inds])
+            if separ_inds != []:
+                diff[i,:] += self._separation(position, pos_rest[separ_inds])
+            if align_inds != []:
+                diff[i,:] += self._alignment(velocity, vel_rest[align_inds])
+
+        # print(diff[i,:])
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
         self.boids_positions += velocities
         self.boids_velocities = velocities
 
-    def _cohesion(self, position, pos_rest):
+    def _cohesion(self, position, pos_others):
 
-        close_indeces = np.where(
-            abs(pos_rest - position) < self.cohesion_distance)
-        mean = np.mean(pos_rest[close_indeces], axis=0)
+        mean = np.mean(pos_others, axis=0)
 
         return self.cohesion_factor * (mean -position)
 
-    def _separation(self, position, pos_rest):
+    def _separation(self, position, pos_others):
 
-        close_indeces = np.where(
-            abs(pos_rest - position) < self.separation_distance)
-        mean = np.mean(pos_rest[close_indeces], axis=0)
+        mean = np.mean(pos_others, axis=0)
 
         return self.separation_factor * (position -mean)
+
+    def _alignment(self, velocity, vel_others):
+
+        mean = np.mean(vel_others, axis=0)
+
+        return self.alignment_factor * (mean -velocity)
 
     def _avoid_boundary(self):
 

@@ -30,13 +30,14 @@ if __name__ == '__main__':
     parser.add_argument('-ms', '--max_speed', type=float, default=3.0)
     parser.add_argument('-m', '--margin', type=float, default=0.05)
     parser.add_argument('-avf', '--avoid_factor', type=float, default=0.02)
-    parser.add_argument('-cf', '--cohesion_factor', type=float, default=0.002)
-    parser.add_argument('-sf', '--separation_factor', type=float, default=0.02)
-    # parser.add_argument('-af', '--alingment_factor', type=float, default=0.02)
-    parser.add_argument('-cr', '--cohesion_ratio', type=float, default=0.02)
-    parser.add_argument('-sef','--separation_ratio', type=float, default=0.01)
-    # parser.add_argument('-af', '--alingment_ratio', type=float, default=0.02)
+    parser.add_argument('-cf', '--cohesion_factor', type=float, default=0.01)
+    parser.add_argument('-sef', '--separation_factor', type=float, default=0.01)
+    parser.add_argument('-af', '--alignment_factor', type=float, default=0.01)
+    parser.add_argument('-cr', '--cohesion_ratio', type=float, default=0.1)
+    parser.add_argument('-ser','--separation_ratio', type=float, default=0.05)
+    parser.add_argument('-ar', '--alignment_ratio', type=float, default=0.025)
 
+    # init args
     parser.add_argument('-it', '--init_type', type=str, default='fixed_speed')
     parser.add_argument('-ir', '--init_ratio', type=float, default=0.1)
     parser.add_argument('-is', '--init_speed', type=float, default=2.5)
@@ -64,6 +65,8 @@ if __name__ == '__main__':
             'cohesion_ratio': args.cohesion_ratio,
             'separation_factor': args.separation_factor,
             'separation_ratio': args.separation_ratio,
+            'alignment_factor': args.alignment_factor,
+            'alignment_ratio': args.alignment_ratio,
             'min_speed': args.max_speed * args.speed_ratio,
             'max_speed': args.max_speed,
             'ranges_boids': { # TEMPORARY. FIX THESE WHEN READY TO BE SET.
