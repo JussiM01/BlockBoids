@@ -89,7 +89,7 @@ class Model:
         diff_x_low = turn_speed * (
             xs_low < self.margin * self.x_bound).astype(float)
         diff_y_low = turn_speed * (
-            ys_low < self.margin * self.y_bound).astype(float)
+            ys_low < self.margin * self.x_bound).astype(float)
         diff_x_high = -1 * turn_speed * (
             xs_high < self.margin * self.x_bound).astype(float)
         diff_y_high = -1 * turn_speed * (
