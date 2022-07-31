@@ -1,13 +1,13 @@
 import argparse
 
-from boids.animation import Animation
-from boids.model import Model
+from boids.animation import Simulation
+from boids.model import DynamicsModel
 
 
 def main(params):
 
-    dynamics_model = Model(params['model'])
-    simulation = Animation(dynamics_model, params['animation'])
+    dynamics_model = DynamicsModel(params['model'])
+    simulation = Simulation(dynamics_model, params['animation'])
     simulation.run()
 
 

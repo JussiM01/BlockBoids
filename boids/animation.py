@@ -5,7 +5,7 @@ from matplotlib.animation import FuncAnimation
 from boids.utils import init_animation
 
 
-class Animation:
+class Simulation:
     """Class for creating the animation for the boids movements."""
 
     def __init__(self, model, params):

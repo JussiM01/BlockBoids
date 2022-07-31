@@ -4,7 +4,7 @@ from boids.utils import random_states
 from copy import deepcopy
 
 
-class Model:
+class DynamicsModel:
     """Class for modelling the boids movements."""
 
     def __init__(self, params):
