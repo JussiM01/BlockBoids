@@ -18,15 +18,22 @@ class DynamicsModel:
         self.separation_factor = params['separation_factor']
         self.alignment_factor = params['alignment_factor']
         self.cohesion_factor = params['cohesion_factor']
-        self.separation_distance = params['separation_ratio'] * params['x_bound']
-        self.alignment_distance = params['alignment_ratio'] * params['x_bound']
-        self.cohesion_distance = params['cohesion_ratio'] * params['x_bound']
+        self.separation_distance = params['separation_distance']
+        self.alignment_distance = params['alignment_distance']
+        self.cohesion_distance = params['cohesion_distance']
         self.x_bound = params['x_bound']
         self.y_bound = params['y_bound']
         self.margin = params['margin']
         self.avoid_factor = params['avoid_factor']
         self.min_speed = params['min_speed']
         self.max_speed = params['max_speed']
+
+        print('separation_factor', self.separation_factor)
+        print('cohesion_factor', self.cohesion_factor)
+        print('alignment_factor', self.alignment_factor)
+        print('separation_distance', self.separation_distance)
+        print('cohesion_distance', self.cohesion_distance)
+        print('alignment_distance', self.alignment_distance)
 
     def update(self):
 
@@ -38,12 +45,18 @@ class DynamicsModel:
             pos_rest = np.delete(deepcopy(self.boids_positions), i, axis=0)
             vel_rest = np.delete(deepcopy(self.boids_velocities), i, axis=0)
 
-            cohes_inds = np.where(np.linalg.norm(pos_rest -position, axis=1)
-                < self.cohesion_distance)[0]
+            cohes_inds = np.where(
+                (self.separation_distance <=
+                 np.linalg.norm(pos_rest -position, axis=1)) &
+                (np.linalg.norm(pos_rest -position, axis=1)
+                 < self.cohesion_distance))[0]
             separ_inds = np.where(np.linalg.norm(pos_rest -position, axis=1)
                 < self.separation_distance)[0]
-            align_inds = np.where(np.linalg.norm(pos_rest -position, axis=1)
-                < self.alignment_distance)[0]
+            align_inds = np.where(
+                (self.separation_distance <=
+                 np.linalg.norm(pos_rest -position, axis=1)) &
+                (np.linalg.norm(pos_rest -position, axis=1)
+                 < self.alignment_distance))[0]
 
             if cohes_inds != []:
                 diff[i,:] += self._cohesion(position, pos_rest[cohes_inds])
@@ -86,14 +99,10 @@ class DynamicsModel:
         xs_high = abs(self.x_bound - xs)
         ys_high = abs(self.y_bound - ys)
 
-        diff_x_low = turn_speed * (
-            xs_low < self.margin * self.x_bound).astype(float)
-        diff_y_low = turn_speed * (
-            ys_low < self.margin * self.x_bound).astype(float)
-        diff_x_high = -1 * turn_speed * (
-            xs_high < self.margin * self.x_bound).astype(float)
-        diff_y_high = -1 * turn_speed * (
-            ys_high < self.margin * self.x_bound).astype(float)
+        diff_x_low = turn_speed * (xs_low < self.margin).astype(float)
+        diff_y_low = turn_speed * (ys_low < self.margin).astype(float)
+        diff_x_high = -1 * turn_speed * (xs_high < self.margin).astype(float)
+        diff_y_high = -1 * turn_speed * (ys_high < self.margin).astype(float)
 
         avoid_diff_x = diff_x_low + diff_x_high
         avoid_diff_y = diff_y_low + diff_y_high
