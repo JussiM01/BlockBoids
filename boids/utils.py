@@ -34,6 +34,10 @@ def random_states(num_points, params):
             [[np.cos(thetas[i]), np.sin(thetas[i])]
              for i in range(num_points)], dtype=float)
 
+    else:
+        raise ValueError('`init_type` value should be one of: `fixed_speed`,'
+            ' `fixed_velocity`, `angle_range`.')
+
     return positions, velocities
 
 
