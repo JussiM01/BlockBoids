@@ -36,6 +36,7 @@ if __name__ == '__main__':
     parser.add_argument('-cd', '--cohesion_distance', type=float, default=20.0)
     parser.add_argument('-sd','--separation_distance', type=float, default=2.0)
     parser.add_argument('-ad', '--alignment_distance', type=float, default=20.0)
+    parser.add_argument('-bb', '--boundary_behaviour', type=str, default='avoid')
 
     # init args
     parser.add_argument('-it', '--init_type', type=str, default='fixed_speed')
@@ -72,6 +73,7 @@ if __name__ == '__main__':
             'alignment_distance': args.alignment_distance,
             'min_speed': args.min_speed,
             'max_speed': args.max_speed,
+            'boundary_behaviour': args.boundary_behaviour,
             'ranges_boids': { # TEMPORARY. FIX THESE WHEN READY TO BE SET.
                 'init_type': args.init_type,
                 'x_pos_min': args.init_x_margin,

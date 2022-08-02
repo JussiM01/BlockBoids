@@ -21,6 +21,7 @@ class DynamicsModel:
         self.separation_distance = params['separation_distance']
         self.alignment_distance = params['alignment_distance']
         self.cohesion_distance = params['cohesion_distance']
+        self.boundary_behaviour = params['boundary_behaviour']
         self.x_bound = params['x_bound']
         self.y_bound = params['y_bound']
         self.margin = params['margin']
@@ -37,7 +38,13 @@ class DynamicsModel:
 
     def update(self):
 
-        diff = self._avoid_boundary()
+        if self.boundary_behaviour == 'avoid':
+            diff = self._avoid_boundary()
+        elif self.boundary_behaviour == 'wrap':
+            diff = np.zeros((self.num_boids, 2), dtype=float)
+        else:
+            raise ValueError('`boundary_behaviour` value should be either'
+                ' `avoid` or `wrap`.')
 
         for i in range(self.num_boids):
             position = self.boids_positions[i]
@@ -68,7 +75,12 @@ class DynamicsModel:
         # print(diff[i,:])
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
-        self.boids_positions += velocities
+
+        if self.boundary_behaviour == 'avoid':
+            self.boids_positions += velocities
+        elif self.boundary_behaviour == 'wrap':
+            self.boids_positions = self._wrap_around(
+                self.boids_positions + velocities)
         self.boids_velocities = velocities
 
     def _cohesion(self, position, pos_others):
@@ -109,6 +121,13 @@ class DynamicsModel:
         avoid_diff = np.stack((avoid_diff_x, avoid_diff_y), axis=1)
 
         return avoid_diff
+
+    def _wrap_around(self, positions):
+
+        max_arr = np.array(
+            [[self.x_bound, self.y_bound] for i in range(self.num_boids)])
+
+        return np.remainder(positions, max_arr)
 
     def _cut_off(self, velocities):
 
