@@ -91,9 +91,9 @@ class DynamicsModel:
 
     def _separation(self, position, pos_others):
 
-        mean = np.mean(pos_others, axis=0)
+        differences = np.sum(position -pos_others, axis=0)
 
-        return self.separation_factor * (position -mean)
+        return self.separation_factor * differences
 
     def _alignment(self, velocity, vel_others):
 
