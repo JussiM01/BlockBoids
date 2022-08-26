@@ -16,8 +16,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
     # common args
-    parser.add_argument('-mx', '--max_x_value', type=float, default=2000.0)
-    parser.add_argument('-my', '--max_y_value', type=float, default=1000.0)
+    parser.add_argument('-mx', '--max_x_value', type=float, default=1500.0)
+    parser.add_argument('-my', '--max_y_value', type=float, default=750.0)
 
     # fig args
     parser.add_argument('-fx', '--fig_size_x', type=float, default=10.0)
@@ -25,18 +25,19 @@ if __name__ == '__main__':
     parser.add_argument('-sb', '--size_boids', type=int, default=10)
 
     # model args
-    parser.add_argument('-nb', '--num_boids', type=int, default=1000)
+    parser.add_argument('-nb', '--num_boids', type=int, default=300)
     parser.add_argument('-mis', '--min_speed', type=float, default=2.0)
     parser.add_argument('-mas', '--max_speed', type=float, default=3.0)
-    parser.add_argument('-m', '--margin', type=float, default=200.0)
-    parser.add_argument('-avf', '--avoid_factor', type=float, default=0.02)
-    parser.add_argument('-cf', '--cohesion_factor', type=float, default=0.01)
-    parser.add_argument('-sf', '--separation_factor', type=float, default=0.01)
-    parser.add_argument('-af', '--alignment_factor', type=float, default=0.01)
-    parser.add_argument('-cd', '--cohesion_distance', type=float, default=20.0)
-    parser.add_argument('-sd','--separation_distance', type=float, default=2.0)
-    parser.add_argument('-ad', '--alignment_distance', type=float, default=20.0)
-    parser.add_argument('-bb', '--boundary_behaviour', type=str, default='avoid')
+    parser.add_argument('-m', '--margin', type=float, default=40.0)
+    parser.add_argument('-avf', '--avoid_factor', type=float, default=1.0)
+    parser.add_argument('-cf', '--cohesion_factor', type=float, default=0.005)
+    parser.add_argument('-sf', '--separation_factor', type=float, default=0.05)
+    parser.add_argument('-af', '--alignment_factor', type=float, default=0.05)
+    parser.add_argument('-cd', '--cohesion_distance', type=float, default=75.0)
+    parser.add_argument('-sd','--separation_distance', type=float, default=20.0)
+    parser.add_argument('-ad', '--alignment_distance', type=float, default=75.0)
+    parser.add_argument('-bb', '--boundary_behaviour', type=str,
+        default='avoid')
 
     # init args
     parser.add_argument('-it', '--init_type', type=str, default='fixed_speed')
