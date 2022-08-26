@@ -194,8 +194,10 @@ class DynamicsModel:
                 return None
             else:
                 grid_vec = (vector[0] + pair[0] + 1, vector[0] + pair[0] + 1)
-                return (grid_vec[0] * grid_vec[1]) - 1
 
         if self.boundary_behaviour == 'wrap':
-            raise NotImplementedError('Neighbour creation for `wrap` boundary'
-                ' will be implemented later.')
+            modulated = (
+                (vector[0] + pair[0]) % maxx, (vector[1] + pair[1]) % maxy)
+            grid_vec = (modulated[0] + 1, modulated[1] + 1)
+
+        return (grid_vec[0] * grid_vec[1]) - 1
