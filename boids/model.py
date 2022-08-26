@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 from boids.utils import random_states
@@ -28,6 +30,17 @@ class DynamicsModel:
         self.avoid_factor = params['avoid_factor']
         self.min_speed = params['min_speed']
         self.max_speed = params['max_speed']
+
+        self._block_size = max(
+            self.separation_distance,
+            self.alignment_distance,
+            self.cohesion_distance,
+            self.boundary_behaviour,
+            )
+        self._num_x_gird = math.ceil(self.x_bound/self._block_size)
+        self._num_y_gird = math.ceil(self.y_bound/self._block_size)
+        self._num_blocks = self._num_x_gird * self._num_y_gird
+        self._blocks = [set() for i in range(self._num_blocks)]
 
     def update(self):
 
@@ -135,3 +148,10 @@ class DynamicsModel:
                 return velocity
 
         return np.apply_along_axis(lambda v: cut(v), 1, velocities)
+
+    def _block_index(self, vector):
+
+        x_index = math.ceil(vector[0]/self._block_size)
+        y_index = math.ceil(vector[1]/self._block_size)
+
+        return (x_index * y_index) - 1
