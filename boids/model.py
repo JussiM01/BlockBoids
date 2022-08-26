@@ -40,7 +40,18 @@ class DynamicsModel:
         self._num_x_gird = math.ceil(self.x_bound/self._block_size)
         self._num_y_gird = math.ceil(self.y_bound/self._block_size)
         self._num_blocks = self._num_x_gird * self._num_y_gird
+
+        # indeces of the boids in each block (empty set intialization)
         self._blocks = [set() for i in range(self._num_blocks)]
+
+        # block indeces of each boid
+        self._block_indeces = [self._block_index(self.boids_positions[i,:])
+                               for i in range(self.num_boids)]
+
+        # fill the correct indeces to the blocks
+        for i in range(self.num_boids):
+            ind = self._block_indeces[i]
+            self._blocks[ind].add(i)
 
     def update(self):
 
