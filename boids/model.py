@@ -53,6 +53,9 @@ class DynamicsModel:
             ind = self._block_indeces[i]
             self._blocks[ind].add(i)
 
+        # neighbour block indeces
+        self._neighbour_inds = self._create_neighbours()
+
     def update(self):
 
         if self.boundary_behaviour == 'avoid':
@@ -166,3 +169,33 @@ class DynamicsModel:
         y_index = math.ceil(vector[1]/self._block_size)
 
         return (x_index * y_index) - 1
+
+    def _create_neighbours(self):
+
+        inds = []
+        pairs = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+        for i in range(self._num_x_gird):
+            for j in range(self._num_y_gird):
+                neighbours = []
+                for pair in pairs:
+                    candidate = self._get_neighbours((i, j), pair)
+                    if candidate is not None:
+                        inds.append(candidate)
+
+    def _get_neighbours(self, vector, pair):
+
+        maxx = self._num_x_gird - 1
+        maxy = self._num_x_gird - 1
+
+        if self.boundary_behaviour == 'avoid':
+            if (vector[0] + pair[0]) < 0) or (vector[1] + pair[1]) < 0):
+                return None
+            elif (vector[0] + pair[0]) > maxx) or (vector[1] + pair[1]) > maxy):
+                return None
+            else:
+                grid_vec = (vector[0] + pair[0] + 1, vector[0] + pair[0] + 1)
+                return (grid_vec[0] * grid_vec[1]) - 1
+
+        if self.boundary_behaviour == 'wrap':
+            raise NotImplementedError('Neighbour creation for `wrap` boundary'
+                ' will be implemented later.')
