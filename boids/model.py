@@ -29,13 +29,6 @@ class DynamicsModel:
         self.min_speed = params['min_speed']
         self.max_speed = params['max_speed']
 
-        print('separation_factor', self.separation_factor)
-        print('cohesion_factor', self.cohesion_factor)
-        print('alignment_factor', self.alignment_factor)
-        print('separation_distance', self.separation_distance)
-        print('cohesion_distance', self.cohesion_distance)
-        print('alignment_distance', self.alignment_distance)
-
     def update(self):
 
         if self.boundary_behaviour == 'avoid':
