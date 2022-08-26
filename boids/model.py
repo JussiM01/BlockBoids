@@ -178,11 +178,11 @@ class DynamicsModel:
             for j in range(self._num_y_gird):
                 neighbours = []
                 for pair in pairs:
-                    candidate = self._get_neighbours((i, j), pair)
-                    if candidate is not None:
-                        inds.append(candidate)
+                    neigh_ind = self._get_neigh_ind((i, j), pair)
+                    if neigh_ind is not None:
+                        inds.append(neigh_ind)
 
-    def _get_neighbours(self, vector, pair):
+    def _get_neigh_ind(self, vector, pair):
 
         maxx = self._num_x_gird - 1
         maxy = self._num_x_gird - 1
