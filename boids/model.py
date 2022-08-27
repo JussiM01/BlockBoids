@@ -66,30 +66,35 @@ class DynamicsModel:
                 ' `avoid` or `wrap`.')
 
         for i in range(self.num_boids):
-            position = self.boids_positions[i]
-            velocity = self.boids_velocities[i]
-            pos_rest = np.delete(deepcopy(self.boids_positions), i, axis=0)
-            vel_rest = np.delete(deepcopy(self.boids_velocities), i, axis=0)
 
-            cohes_inds = np.where(
-                (self.separation_distance <=
-                 np.linalg.norm(pos_rest -position, axis=1)) &
-                (np.linalg.norm(pos_rest -position, axis=1)
-                 < self.cohesion_distance))[0]
-            separ_inds = np.where(np.linalg.norm(pos_rest -position, axis=1)
-                < self.separation_distance)[0]
-            align_inds = np.where(
-                (self.separation_distance <=
-                 np.linalg.norm(pos_rest -position, axis=1)) &
-                (np.linalg.norm(pos_rest -position, axis=1)
-                 < self.alignment_distance))[0]
+            relevant_inds = self._get_relevant_inds(i)
+            if len(relevant_inds) != 0:
 
-            if cohes_inds != []:
-                diff[i,:] += self._cohesion(position, pos_rest[cohes_inds])
-            if separ_inds != []:
-                diff[i,:] += self._separation(position, pos_rest[separ_inds])
-            if align_inds != []:
-                diff[i,:] += self._alignment(velocity, vel_rest[align_inds])
+                position = self.boids_positions[i]
+                velocity = self.boids_velocities[i]
+
+                pos_rel = deepcopy(self.boids_positions[relevant_inds])
+                vel_rel = deepcopy(self.boids_velocities[relevant_inds])
+
+                cohes_inds = np.where(
+                    (self.separation_distance <=
+                     np.linalg.norm(pos_rel -position, axis=1)) &
+                    (np.linalg.norm(pos_rel -position, axis=1)
+                     < self.cohesion_distance))[0]
+                separ_inds = np.where(np.linalg.norm(pos_rel -position, axis=1)
+                    < self.separation_distance)[0]
+                align_inds = np.where(
+                    (self.separation_distance <=
+                     np.linalg.norm(pos_rel -position, axis=1)) &
+                    (np.linalg.norm(pos_rel -position, axis=1)
+                     < self.alignment_distance))[0]
+
+                if cohes_inds != []:
+                    diff[i,:] += self._cohesion(position, pos_rel[cohes_inds])
+                if separ_inds != []:
+                    diff[i,:] += self._separation(position, pos_rel[separ_inds])
+                if align_inds != []:
+                    diff[i,:] += self._alignment(velocity, vel_rel[align_inds])
 
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
@@ -100,6 +105,11 @@ class DynamicsModel:
             self.boids_positions = self._wrap_around(
                 self.boids_positions + velocities)
         self.boids_velocities = velocities
+
+        ######################################################
+        ## UPDATE self._blocks & self._block_indeces HERE ! ##
+        ##    BOTH UPDATES NEED TO BE VECTORIZED METHODS    ##
+        ######################################################
 
     def _cohesion(self, position, pos_others):
 
@@ -208,7 +218,8 @@ class DynamicsModel:
 
         block_index = self._block_indeces[boid_index]
         neighbours = self._neighbour_inds[block_index]
-        own_block_others = self._blocks[boid_index] - {boid_index}
-        relevant_inds = own_block_others.union(*self._blocks[neighbours])
+        own_block_others = self._blocks[block_index] - {boid_index}
+        neighbours = [self._blocks[neigh] for neigh in neighbours]
+        relevant_inds = own_block_others.union(*neighbours)
 
         return np.array(list(relevant_inds))
