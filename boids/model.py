@@ -35,7 +35,6 @@ class DynamicsModel:
             self.separation_distance,
             self.alignment_distance,
             self.cohesion_distance,
-            self.boundary_behaviour,
             )
         self._num_x_gird = math.ceil(self.x_bound/self._block_size)
         self._num_y_gird = math.ceil(self.y_bound/self._block_size)
@@ -92,7 +91,6 @@ class DynamicsModel:
             if align_inds != []:
                 diff[i,:] += self._alignment(velocity, vel_rest[align_inds])
 
-        # print(diff[i,:])
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
 
@@ -173,31 +171,35 @@ class DynamicsModel:
     def _create_neighbours(self):
 
         inds = []
-        pairs = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
-        for i in range(self._num_x_gird):
-            for j in range(self._num_y_gird):
+        pairs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (1, -1), (0, 1), (1, 0),
+            (1, 1)]
+        for j in range(self._num_y_gird):
+            for i in range(self._num_x_gird):
                 neighbours = []
                 for pair in pairs:
                     neigh_ind = self._get_neigh_ind((i, j), pair)
                     if neigh_ind is not None:
-                        inds.append(neigh_ind)
+                        neighbours.append(neigh_ind)
+                inds.append(neighbours)
+
+        return inds
 
     def _get_neigh_ind(self, vector, pair):
 
-        maxx = self._num_x_gird - 1
-        maxy = self._num_x_gird - 1
+        mx = self._num_x_gird - 1
+        my = self._num_y_gird - 1
 
         if self.boundary_behaviour == 'avoid':
-            if (vector[0] + pair[0]) < 0) or (vector[1] + pair[1]) < 0):
+            if ((vector[0] + pair[0]) < 0) or ((vector[1] + pair[1]) < 0):
                 return None
-            elif (vector[0] + pair[0]) > maxx) or (vector[1] + pair[1]) > maxy):
+            elif ((vector[0] + pair[0]) > mx) or ((vector[1] + pair[1]) > my):
                 return None
             else:
-                grid_vec = (vector[0] + pair[0] + 1, vector[0] + pair[0] + 1)
+                grid_vec = (vector[0] + pair[0], vector[1] + pair[1])
 
         if self.boundary_behaviour == 'wrap':
             modulated = (
-                (vector[0] + pair[0]) % maxx, (vector[1] + pair[1]) % maxy)
-            grid_vec = (modulated[0] + 1, modulated[1] + 1)
+                (vector[0] + pair[0]) % (mx+1), (vector[1] + pair[1]) % (my+1))
+            grid_vec = (modulated[0], modulated[1])
 
-        return (grid_vec[0] * grid_vec[1]) - 1
+        return grid_vec[0] + self._num_x_gird * grid_vec[1]
