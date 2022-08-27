@@ -203,3 +203,12 @@ class DynamicsModel:
             grid_vec = (modulated[0], modulated[1])
 
         return grid_vec[0] + self._num_x_gird * grid_vec[1]
+
+    def _get_relevant_inds(self, boid_index):
+
+        block_index = self._block_indeces[boid_index]
+        neighbours = self._neighbour_inds[block_index]
+        own_block_others = self._blocks[boid_index] - {boid_index}
+        relevant_inds = own_block_others.union(*self._blocks[neighbours])
+
+        return np.array(list(relevant_inds))
