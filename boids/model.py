@@ -165,10 +165,21 @@ class DynamicsModel:
 
     def _block_index(self, vector):
 
-        x_index = math.ceil(vector[0]/self._block_size)
-        y_index = math.ceil(vector[1]/self._block_size)
+        x_index = int(vector[0]/self._block_size)
+        if x_index == self._num_x_gird:
+            if self.boundary_behaviour == 'avoid':
+                x_index -= 1
+            elif self.boundary_behaviour == 'wrap':
+                x_index = 0
 
-        return (x_index * y_index) - 1
+        y_index = int(vector[1]/self._block_size)
+        if y_index == self._num_y_gird:
+            if self.boundary_behaviour == 'avoid':
+                y_index -= 1
+            elif self.boundary_behaviour == 'wrap':
+                y_index = 0
+
+        return x_index + self._num_x_gird * y_index
 
     def _get_blocks(self):
 
