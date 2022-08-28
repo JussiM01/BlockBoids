@@ -40,19 +40,8 @@ class DynamicsModel:
         self._num_y_gird = math.ceil(self.y_bound/self._block_size)
         self._num_blocks = self._num_x_gird * self._num_y_gird
 
-        # indeces of the boids in each block (empty set intialization)
-        self._blocks = [set() for i in range(self._num_blocks)]
-
-        # block indeces of each boid
-        self._block_indeces = [self._block_index(self.boids_positions[i,:])
-                               for i in range(self.num_boids)]
-
-        # fill the correct indeces to the blocks
-        for i in range(self.num_boids):
-            ind = self._block_indeces[i]
-            self._blocks[ind].add(i)
-
-        # neighbour block indeces
+        self._block_indeces = self._get_block_indeces()
+        self._blocks = self._get_blocks()
         self._neighbour_inds = self._create_neighbours()
 
     def update(self):
@@ -106,10 +95,8 @@ class DynamicsModel:
                 self.boids_positions + velocities)
         self.boids_velocities = velocities
 
-        ######################################################
-        ## UPDATE self._blocks & self._block_indeces HERE ! ##
-        ##    BOTH UPDATES NEED TO BE VECTORIZED METHODS    ##
-        ######################################################
+        self._block_indeces = self._get_block_indeces()
+        self._blocks = self._get_blocks()
 
     def _cohesion(self, position, pos_others):
 
@@ -171,12 +158,26 @@ class DynamicsModel:
 
         return np.apply_along_axis(lambda v: cut(v), 1, velocities)
 
+    def _get_block_indeces(self):
+
+        return [self._block_index(self.boids_positions[i,:])
+                for i in range(self.num_boids)]
+
     def _block_index(self, vector):
 
         x_index = math.ceil(vector[0]/self._block_size)
         y_index = math.ceil(vector[1]/self._block_size)
 
         return (x_index * y_index) - 1
+
+    def _get_blocks(self):
+
+        blocks = [set() for i in range(self._num_blocks)]
+        for i in range(self.num_boids):
+            ind = self._block_indeces[i]
+            blocks[ind].add(i)
+
+        return blocks
 
     def _create_neighbours(self):
 
