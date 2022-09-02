@@ -4,11 +4,17 @@ from boids.animation import Simulation
 from boids.model import DynamicsModel
 
 
-def main(params):
+def main(params, mode):
 
     dynamics_model = DynamicsModel(params['model'])
-    simulation = Simulation(dynamics_model, params['animation'])
-    simulation.run()
+
+    if mode == 'simulation':
+        simulation = Simulation(dynamics_model, params['animation'])
+        simulation.run()
+        
+    elif mode == 'profiling':
+        for i in range(params['num_steps']):
+            dynamics_model.update()
 
 
 if __name__ == '__main__':
@@ -40,6 +46,8 @@ if __name__ == '__main__':
         default='avoid')
 
     # init args
+    parser.add_argument('-p', '--profiling', action='store_true')
+    parser.add_argument('-ns',  '--num_steps', type=int, default=100)
     parser.add_argument('-it', '--init_type', type=str, default='fixed_speed')
     parser.add_argument('-ixm', '--init_x_margin', type=float, default=200)
     parser.add_argument('-iym', '--init_y_margin', type=float, default=200)
@@ -86,8 +94,13 @@ if __name__ == '__main__':
                 'init_angle': args.init_angle,
                 'angle_width': args.angle_width,
             },
-
         },
+        'num_steps': args.num_steps
     }
 
-    main(params)
+    if args.profiling:
+        mode = 'profiling'
+    else:
+        mode = 'simulation'
+
+    main(params, mode)
