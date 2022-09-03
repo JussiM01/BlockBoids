@@ -11,7 +11,7 @@ def main(params, mode):
     if mode == 'simulation':
         simulation = Simulation(dynamics_model, params['animation'])
         simulation.run()
-        
+
     elif mode == 'profiling':
         for i in range(params['num_steps']):
             dynamics_model.update()
@@ -31,6 +31,7 @@ if __name__ == '__main__':
     parser.add_argument('-sb', '--size_boids', type=int, default=10)
 
     # model args
+    parser.add_argument('-no', '--no_blocks', action='store_true')
     parser.add_argument('-nb', '--num_boids', type=int, default=300)
     parser.add_argument('-mis', '--min_speed', type=float, default=2.0)
     parser.add_argument('-mas', '--max_speed', type=float, default=3.0)
@@ -59,6 +60,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if args.no_blocks:
+        use_blocks = False
+    else:
+        use_blocks = True
+
     params = {
         'animation': {
             'size_x': args.fig_size_x,
@@ -69,6 +75,7 @@ if __name__ == '__main__':
             'color_boids': (0, 0, 0, 1),
         },
         'model': {
+            'use_blocks': use_blocks,
             'num_boids': args.num_boids,
             'x_bound': args.max_x_value,
             'y_bound': args.max_y_value,

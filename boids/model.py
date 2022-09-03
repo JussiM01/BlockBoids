@@ -14,6 +14,7 @@ class DynamicsModel:
         boids_positions, boids_velocities = random_states(
             params['num_boids'], params['ranges_boids'])
 
+        self.use_blocks = params['use_blocks']
         self.num_boids = params['num_boids']
         self.boids_positions = boids_positions
         self.boids_velocities = boids_velocities
@@ -31,18 +32,19 @@ class DynamicsModel:
         self.min_speed = params['min_speed']
         self.max_speed = params['max_speed']
 
-        self._block_size = max(
-            self.separation_distance,
-            self.alignment_distance,
-            self.cohesion_distance,
-            )
-        self._num_x_gird = math.ceil(self.x_bound/self._block_size)
-        self._num_y_gird = math.ceil(self.y_bound/self._block_size)
-        self._num_blocks = self._num_x_gird * self._num_y_gird
+        if self.use_blocks:
+            self._block_size = max(
+                self.separation_distance,
+                self.alignment_distance,
+                self.cohesion_distance,
+                )
+            self._num_x_gird = math.ceil(self.x_bound/self._block_size)
+            self._num_y_gird = math.ceil(self.y_bound/self._block_size)
+            self._num_blocks = self._num_x_gird * self._num_y_gird
 
-        self._block_indeces = self._get_block_indeces()
-        self._blocks = self._get_blocks()
-        self._neighbour_inds = self._create_neighbours()
+            self._block_indeces = self._get_block_indeces()
+            self._blocks = self._get_blocks()
+            self._neighbour_inds = self._create_neighbours()
 
     def update(self):
 
@@ -56,7 +58,12 @@ class DynamicsModel:
 
         for i in range(self.num_boids):
 
-            relevant_inds = self._get_relevant_inds(i)
+            if self.use_blocks:
+                relevant_inds = self._get_relevant_inds(i)
+            else:
+                relevant_inds = np.array([j for j in range(self.num_boids)
+                    if j != i])
+
             if len(relevant_inds) != 0:
 
                 position = self.boids_positions[i]
@@ -95,8 +102,9 @@ class DynamicsModel:
                 self.boids_positions + velocities)
         self.boids_velocities = velocities
 
-        self._block_indeces = self._get_block_indeces()
-        self._blocks = self._get_blocks()
+        if self.use_blocks:
+            self._block_indeces = self._get_block_indeces()
+            self._blocks = self._get_blocks()
 
     def _cohesion(self, position, pos_others):
 
