@@ -135,10 +135,12 @@ class DynamicsModel:
         xs_high = abs(self.x_bound - xs)
         ys_high = abs(self.y_bound - ys)
 
-        diff_x_low = turn_speed * (xs_low < self.margin).astype(float)
-        diff_y_low = turn_speed * (ys_low < self.margin).astype(float)
-        diff_x_high = -1 * turn_speed * (xs_high < self.margin).astype(float)
-        diff_y_high = -1 * turn_speed * (ys_high < self.margin).astype(float)
+        diff_x_low = turn_speed * (xs_low < self.margin).astype(self.dtype)
+        diff_y_low = turn_speed * (ys_low < self.margin).astype(self.dtype)
+        diff_x_high = -1 * turn_speed * (xs_high < self.margin).astype(
+            self.dtype)
+        diff_y_high = -1 * turn_speed * (ys_high < self.margin).astype(
+            self.dtype)
 
         avoid_diff_x = diff_x_low + diff_x_high
         avoid_diff_y = diff_y_low + diff_y_high
