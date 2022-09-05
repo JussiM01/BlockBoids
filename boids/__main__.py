@@ -47,6 +47,7 @@ if __name__ == '__main__':
         default='avoid')
 
     # init args
+    parser.add_argument('-dt', '--dtype', type=str, default='float16')
     parser.add_argument('-p', '--profiling', action='store_true')
     parser.add_argument('-ns',  '--num_steps', type=int, default=100)
     parser.add_argument('-it', '--init_type', type=str, default='fixed_speed')
@@ -65,6 +66,12 @@ if __name__ == '__main__':
     else:
         use_blocks = True
 
+    if args.dtype in ['float16', 'float32', 'float64']:
+        dtype = args.dtype
+    else:
+        raise ValueError('The `dtype` value should be one of the following:'
+            ' `float16`, `float32` or `float64`.')
+
     params = {
         'animation': {
             'size_x': args.fig_size_x,
@@ -75,6 +82,7 @@ if __name__ == '__main__':
             'color_boids': (0, 0, 0, 1),
         },
         'model': {
+            'dtype': dtype,
             'use_blocks': use_blocks,
             'num_boids': args.num_boids,
             'x_bound': args.max_x_value,
@@ -91,6 +99,7 @@ if __name__ == '__main__':
             'max_speed': args.max_speed,
             'boundary_behaviour': args.boundary_behaviour,
             'ranges_boids': { # TEMPORARY. FIX THESE WHEN READY TO BE SET.
+                'dtype': dtype,
                 'init_type': args.init_type,
                 'x_pos_min': args.init_x_margin,
                 'x_pos_max': args.max_x_value - args.init_x_margin,

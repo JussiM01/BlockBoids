@@ -14,6 +14,7 @@ class DynamicsModel:
         boids_positions, boids_velocities = random_states(
             params['num_boids'], params['ranges_boids'])
 
+        self.dtype = params['dtype']
         self.use_blocks = params['use_blocks']
         self.num_boids = params['num_boids']
         self.boids_positions = boids_positions
@@ -51,7 +52,7 @@ class DynamicsModel:
         if self.boundary_behaviour == 'avoid':
             diff = self._avoid_boundary()
         elif self.boundary_behaviour == 'wrap':
-            diff = np.zeros((self.num_boids, 2), dtype=float)
+            diff = np.zeros((self.num_boids, 2), dtype=self.dtype)
         else:
             raise ValueError('`boundary_behaviour` value should be either'
                 ' `avoid` or `wrap`.')
@@ -148,7 +149,8 @@ class DynamicsModel:
     def _wrap_around(self, positions):
 
         max_arr = np.array(
-            [[self.x_bound, self.y_bound] for i in range(self.num_boids)])
+            [[self.x_bound, self.y_bound] for i in range(self.num_boids)],
+              dtype=self.dtype)
 
         return np.remainder(positions, max_arr)
 

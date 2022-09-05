@@ -14,17 +14,18 @@ def random_states(num_points, params):
         thetas = np.random.uniform(0, 2*np.pi, num_points)
         velocities = params['init_speed'] * np.array(
             [[np.cos(thetas[i]), np.sin(thetas[i])]
-             for i in range(num_points)], dtype=float)
+             for i in range(num_points)], dtype=params['dtype'])
 
     elif params['init_type'] == 'fixed_velocity':
-        init_direction = np.array(params['init_direction'], float)
+        init_direction = np.array(params['init_direction'],
+            dtype=params['dtype'])
         norm = np.linalg.norm(init_direction)
         if norm == 0:
             raise ValueError('Args `init_direct_x` and `init_direct_y`'
                 ' are not allowed to be simultaniously zeros.')
         normalized = init_direction / norm
         velocities = params['init_speed'] * np.array(
-            [normalized for i in range(num_points)], dtype=float)
+            [normalized for i in range(num_points)], dtype=params['dtype'])
 
     elif params['init_type'] == 'angle_range':
         angle = params['init_angle'] * np.pi / 180
@@ -32,7 +33,7 @@ def random_states(num_points, params):
         thetas = np.random.uniform(angle - limit, angle + limit, num_points)
         velocities = params['init_speed'] * np.array(
             [[np.cos(thetas[i]), np.sin(thetas[i])]
-             for i in range(num_points)], dtype=float)
+             for i in range(num_points)], dtype=params['dtype'])
 
     else:
         raise ValueError('`init_type` value should be one of: `fixed_speed`,'
