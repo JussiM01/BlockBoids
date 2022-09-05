@@ -4,11 +4,17 @@ from boids.animation import Simulation
 from boids.model import DynamicsModel
 
 
-def main(params):
+def main(params, mode):
 
     dynamics_model = DynamicsModel(params['model'])
-    simulation = Simulation(dynamics_model, params['animation'])
-    simulation.run()
+
+    if mode == 'simulation':
+        simulation = Simulation(dynamics_model, params['animation'])
+        simulation.run()
+
+    elif mode == 'profiling':
+        for i in range(params['num_steps']):
+            dynamics_model.update()
 
 
 if __name__ == '__main__':
@@ -25,6 +31,7 @@ if __name__ == '__main__':
     parser.add_argument('-sb', '--size_boids', type=int, default=10)
 
     # model args
+    parser.add_argument('-no', '--no_blocks', action='store_true')
     parser.add_argument('-nb', '--num_boids', type=int, default=300)
     parser.add_argument('-mis', '--min_speed', type=float, default=2.0)
     parser.add_argument('-mas', '--max_speed', type=float, default=3.0)
@@ -40,6 +47,9 @@ if __name__ == '__main__':
         default='avoid')
 
     # init args
+    parser.add_argument('-dt', '--dtype', type=str, default='float16')
+    parser.add_argument('-p', '--profiling', action='store_true')
+    parser.add_argument('-ns',  '--num_steps', type=int, default=100)
     parser.add_argument('-it', '--init_type', type=str, default='fixed_speed')
     parser.add_argument('-ixm', '--init_x_margin', type=float, default=200)
     parser.add_argument('-iym', '--init_y_margin', type=float, default=200)
@@ -51,6 +61,17 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if args.no_blocks:
+        use_blocks = False
+    else:
+        use_blocks = True
+
+    if args.dtype in ['float16', 'float32', 'float64']:
+        dtype = args.dtype
+    else:
+        raise ValueError('The `dtype` value should be one of the following:'
+            ' `float16`, `float32` or `float64`.')
+
     params = {
         'animation': {
             'size_x': args.fig_size_x,
@@ -61,6 +82,8 @@ if __name__ == '__main__':
             'color_boids': (0, 0, 0, 1),
         },
         'model': {
+            'dtype': dtype,
+            'use_blocks': use_blocks,
             'num_boids': args.num_boids,
             'x_bound': args.max_x_value,
             'y_bound': args.max_y_value,
@@ -76,6 +99,7 @@ if __name__ == '__main__':
             'max_speed': args.max_speed,
             'boundary_behaviour': args.boundary_behaviour,
             'ranges_boids': { # TEMPORARY. FIX THESE WHEN READY TO BE SET.
+                'dtype': dtype,
                 'init_type': args.init_type,
                 'x_pos_min': args.init_x_margin,
                 'x_pos_max': args.max_x_value - args.init_x_margin,
@@ -86,8 +110,13 @@ if __name__ == '__main__':
                 'init_angle': args.init_angle,
                 'angle_width': args.angle_width,
             },
-
         },
+        'num_steps': args.num_steps
     }
 
-    main(params)
+    if args.profiling:
+        mode = 'profiling'
+    else:
+        mode = 'simulation'
+
+    main(params, mode)

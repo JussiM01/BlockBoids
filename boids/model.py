@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 
 from boids.utils import random_states
@@ -12,6 +14,8 @@ class DynamicsModel:
         boids_positions, boids_velocities = random_states(
             params['num_boids'], params['ranges_boids'])
 
+        self.dtype = params['dtype']
+        self.use_blocks = params['use_blocks']
         self.num_boids = params['num_boids']
         self.boids_positions = boids_positions
         self.boids_velocities = boids_velocities
@@ -29,43 +33,66 @@ class DynamicsModel:
         self.min_speed = params['min_speed']
         self.max_speed = params['max_speed']
 
+        if self.use_blocks:
+            self._block_size = max(
+                self.separation_distance,
+                self.alignment_distance,
+                self.cohesion_distance,
+                )
+            self._num_x_gird = math.ceil(self.x_bound/self._block_size)
+            self._num_y_gird = math.ceil(self.y_bound/self._block_size)
+            self._num_blocks = self._num_x_gird * self._num_y_gird
+
+            self._block_indeces = self._get_block_indeces()
+            self._blocks = self._get_blocks()
+            self._neighbour_inds = self._create_neighbours()
+
     def update(self):
 
         if self.boundary_behaviour == 'avoid':
             diff = self._avoid_boundary()
         elif self.boundary_behaviour == 'wrap':
-            diff = np.zeros((self.num_boids, 2), dtype=float)
+            diff = np.zeros((self.num_boids, 2), dtype=self.dtype)
         else:
             raise ValueError('`boundary_behaviour` value should be either'
                 ' `avoid` or `wrap`.')
 
         for i in range(self.num_boids):
-            position = self.boids_positions[i]
-            velocity = self.boids_velocities[i]
-            pos_rest = np.delete(deepcopy(self.boids_positions), i, axis=0)
-            vel_rest = np.delete(deepcopy(self.boids_velocities), i, axis=0)
 
-            cohes_inds = np.where(
-                (self.separation_distance <=
-                 np.linalg.norm(pos_rest -position, axis=1)) &
-                (np.linalg.norm(pos_rest -position, axis=1)
-                 < self.cohesion_distance))[0]
-            separ_inds = np.where(np.linalg.norm(pos_rest -position, axis=1)
-                < self.separation_distance)[0]
-            align_inds = np.where(
-                (self.separation_distance <=
-                 np.linalg.norm(pos_rest -position, axis=1)) &
-                (np.linalg.norm(pos_rest -position, axis=1)
-                 < self.alignment_distance))[0]
+            if self.use_blocks:
+                relevant_inds = self._get_relevant_inds(i)
+            else:
+                relevant_inds = np.array([j for j in range(self.num_boids)
+                    if j != i])
 
-            if cohes_inds != []:
-                diff[i,:] += self._cohesion(position, pos_rest[cohes_inds])
-            if separ_inds != []:
-                diff[i,:] += self._separation(position, pos_rest[separ_inds])
-            if align_inds != []:
-                diff[i,:] += self._alignment(velocity, vel_rest[align_inds])
+            if len(relevant_inds) != 0:
 
-        # print(diff[i,:])
+                position = self.boids_positions[i]
+                velocity = self.boids_velocities[i]
+
+                pos_rel = deepcopy(self.boids_positions[relevant_inds])
+                vel_rel = deepcopy(self.boids_velocities[relevant_inds])
+
+                cohes_inds = np.where(
+                    (self.separation_distance <=
+                     np.linalg.norm(pos_rel -position, axis=1)) &
+                    (np.linalg.norm(pos_rel -position, axis=1)
+                     < self.cohesion_distance))[0]
+                separ_inds = np.where(np.linalg.norm(pos_rel -position, axis=1)
+                    < self.separation_distance)[0]
+                align_inds = np.where(
+                    (self.separation_distance <=
+                     np.linalg.norm(pos_rel -position, axis=1)) &
+                    (np.linalg.norm(pos_rel -position, axis=1)
+                     < self.alignment_distance))[0]
+
+                if cohes_inds != []:
+                    diff[i,:] += self._cohesion(position, pos_rel[cohes_inds])
+                if separ_inds != []:
+                    diff[i,:] += self._separation(position, pos_rel[separ_inds])
+                if align_inds != []:
+                    diff[i,:] += self._alignment(velocity, vel_rel[align_inds])
+
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
 
@@ -75,6 +102,10 @@ class DynamicsModel:
             self.boids_positions = self._wrap_around(
                 self.boids_positions + velocities)
         self.boids_velocities = velocities
+
+        if self.use_blocks:
+            self._block_indeces = self._get_block_indeces()
+            self._blocks = self._get_blocks()
 
     def _cohesion(self, position, pos_others):
 
@@ -104,10 +135,12 @@ class DynamicsModel:
         xs_high = abs(self.x_bound - xs)
         ys_high = abs(self.y_bound - ys)
 
-        diff_x_low = turn_speed * (xs_low < self.margin).astype(float)
-        diff_y_low = turn_speed * (ys_low < self.margin).astype(float)
-        diff_x_high = -1 * turn_speed * (xs_high < self.margin).astype(float)
-        diff_y_high = -1 * turn_speed * (ys_high < self.margin).astype(float)
+        diff_x_low = turn_speed * (xs_low < self.margin).astype(self.dtype)
+        diff_y_low = turn_speed * (ys_low < self.margin).astype(self.dtype)
+        diff_x_high = -1 * turn_speed * (xs_high < self.margin).astype(
+            self.dtype)
+        diff_y_high = -1 * turn_speed * (ys_high < self.margin).astype(
+            self.dtype)
 
         avoid_diff_x = diff_x_low + diff_x_high
         avoid_diff_y = diff_y_low + diff_y_high
@@ -118,7 +151,8 @@ class DynamicsModel:
     def _wrap_around(self, positions):
 
         max_arr = np.array(
-            [[self.x_bound, self.y_bound] for i in range(self.num_boids)])
+            [[self.x_bound, self.y_bound] for i in range(self.num_boids)],
+              dtype=self.dtype)
 
         return np.remainder(positions, max_arr)
 
@@ -135,3 +169,81 @@ class DynamicsModel:
                 return velocity
 
         return np.apply_along_axis(lambda v: cut(v), 1, velocities)
+
+    def _get_block_indeces(self):
+
+        return [self._block_index(self.boids_positions[i,:])
+                for i in range(self.num_boids)]
+
+    def _block_index(self, vector):
+
+        x_index = int(vector[0]/self._block_size)
+        if x_index == self._num_x_gird:
+            if self.boundary_behaviour == 'avoid':
+                x_index -= 1
+            elif self.boundary_behaviour == 'wrap':
+                x_index = 0
+
+        y_index = int(vector[1]/self._block_size)
+        if y_index == self._num_y_gird:
+            if self.boundary_behaviour == 'avoid':
+                y_index -= 1
+            elif self.boundary_behaviour == 'wrap':
+                y_index = 0
+
+        return x_index + self._num_x_gird * y_index
+
+    def _get_blocks(self):
+
+        blocks = [set() for i in range(self._num_blocks)]
+        for i in range(self.num_boids):
+            ind = self._block_indeces[i]
+            blocks[ind].add(i)
+
+        return blocks
+
+    def _create_neighbours(self):
+
+        inds = []
+        pairs = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (1, -1), (0, 1), (1, 0),
+            (1, 1)]
+        for j in range(self._num_y_gird):
+            for i in range(self._num_x_gird):
+                neighbours = []
+                for pair in pairs:
+                    neigh_ind = self._get_neigh_ind((i, j), pair)
+                    if neigh_ind is not None:
+                        neighbours.append(neigh_ind)
+                inds.append(neighbours)
+
+        return inds
+
+    def _get_neigh_ind(self, vector, pair):
+
+        mx = self._num_x_gird - 1
+        my = self._num_y_gird - 1
+
+        if self.boundary_behaviour == 'avoid':
+            if ((vector[0] + pair[0]) < 0) or ((vector[1] + pair[1]) < 0):
+                return None
+            elif ((vector[0] + pair[0]) > mx) or ((vector[1] + pair[1]) > my):
+                return None
+            else:
+                grid_vec = (vector[0] + pair[0], vector[1] + pair[1])
+
+        if self.boundary_behaviour == 'wrap':
+            modulated = (
+                (vector[0] + pair[0]) % (mx+1), (vector[1] + pair[1]) % (my+1))
+            grid_vec = (modulated[0], modulated[1])
+
+        return grid_vec[0] + self._num_x_gird * grid_vec[1]
+
+    def _get_relevant_inds(self, boid_index):
+
+        block_index = self._block_indeces[boid_index]
+        neighbours = self._neighbour_inds[block_index]
+        own_block_others = self._blocks[block_index] - {boid_index}
+        neighbours = [self._blocks[neigh] for neigh in neighbours]
+        relevant_inds = own_block_others.union(*neighbours)
+
+        return np.array(list(relevant_inds))
