@@ -13,6 +13,7 @@ class Simulation:
         self.model = model
         boids_positions = model.boids_positions
         fig, boids_scatter = init_animation(params, boids_positions)
+        fig.canvas.set_window_title('BlockBoids')
         self.fig = fig
         self.boids_scatter = boids_scatter
 
