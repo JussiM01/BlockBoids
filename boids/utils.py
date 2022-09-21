@@ -44,7 +44,6 @@ def random_states(num_points, params):
 
 def init_animation(params, boids_positions):
 
-    # Dummy version (ADD USE OF params ETC. ...)
     fig = plt.figure(figsize=(params['size_x'], params['size_y']))
     ax = fig.add_axes([0, 0, 1, 1], frameon=False)
     ax.set_xlim(0, params['x_max']), ax.set_xticks([])

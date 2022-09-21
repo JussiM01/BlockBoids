@@ -130,7 +130,7 @@ if __name__ == '__main__':
             'min_speed': args.min_speed,
             'max_speed': args.max_speed,
             'boundary_behavior': args.boundary_behavior,
-            'ranges_boids': { # TEMPORARY. FIX THESE WHEN READY TO BE SET.
+            'ranges_boids': {
                 'dtype': dtype,
                 'init_type': args.init_type,
                 'x_pos_min': args.init_x_margin,
@@ -138,7 +138,7 @@ if __name__ == '__main__':
                 'y_pos_min': args.init_y_margin,
                 'y_pos_max': args.max_y_value - args.init_y_margin,
                 'init_speed': args.init_speed,
-                'init_direction': [args.init_direct_x, args.init_direct_y], # CHANGE LATER ? (only used with fixed_velocity)
+                'init_direction': [args.init_direct_x, args.init_direct_y],
                 'init_angle': args.init_angle,
                 'angle_width': args.angle_width,
             },
