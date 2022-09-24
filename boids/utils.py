@@ -4,6 +4,8 @@ import numpy as np
 
 def random_states(num_points, params):
 
+    np.random.seed(params['random_seed'])
+
     x_positions = np.random.uniform(
         params['x_pos_min'], params['x_pos_max'], num_points)
     y_positions = np.random.uniform(

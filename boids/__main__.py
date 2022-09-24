@@ -90,6 +90,8 @@ if __name__ == '__main__':
     parser.add_argument('-aw', '--angle_width', type=float, default=15.0,
         help='width of the angle range in degrees for the angle_range '
         'initialization')
+    parser.add_argument('-r', '--random_seed', type=int, help='option to use '
+        'a random seed integer for reproducibility')
 
     args = parser.parse_args()
 
@@ -141,6 +143,7 @@ if __name__ == '__main__':
                 'init_direction': [args.init_direct_x, args.init_direct_y],
                 'init_angle': args.init_angle,
                 'angle_width': args.angle_width,
+                'random_seed': args.random_seed,
             },
         },
         'num_steps': args.num_steps
