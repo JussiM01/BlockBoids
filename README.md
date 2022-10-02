@@ -1,6 +1,5 @@
 # BlockBoids
-Boids simulation with NumPy array based updates which are further optimized by
-restricting the computation to relevant rectangular areas.
+NumPy array based boids simulation optimized with spatial tiling.
 
 ## Intro
 The boids model is used for simulating the flocking behavior of birds and the
