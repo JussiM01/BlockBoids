@@ -4,6 +4,8 @@ import numpy as np
 
 def random_states(num_points, params):
 
+    np.random.seed(params['random_seed'])
+
     x_positions = np.random.uniform(
         params['x_pos_min'], params['x_pos_max'], num_points)
     y_positions = np.random.uniform(
@@ -44,7 +46,6 @@ def random_states(num_points, params):
 
 def init_animation(params, boids_positions):
 
-    # Dummy version (ADD USE OF params ETC. ...)
     fig = plt.figure(figsize=(params['size_x'], params['size_y']))
     ax = fig.add_axes([0, 0, 1, 1], frameon=False)
     ax.set_xlim(0, params['x_max']), ax.set_xticks([])

@@ -25,7 +25,7 @@ class DynamicsModel:
         self.separation_distance = params['separation_distance']
         self.alignment_distance = params['alignment_distance']
         self.cohesion_distance = params['cohesion_distance']
-        self.boundary_behaviour = params['boundary_behaviour']
+        self.boundary_behavior = params['boundary_behavior']
         self.x_bound = params['x_bound']
         self.y_bound = params['y_bound']
         self.margin = params['margin']
@@ -49,12 +49,12 @@ class DynamicsModel:
 
     def update(self):
 
-        if self.boundary_behaviour == 'avoid':
+        if self.boundary_behavior == 'avoid':
             diff = self._avoid_boundary()
-        elif self.boundary_behaviour == 'wrap':
+        elif self.boundary_behavior == 'wrap':
             diff = np.zeros((self.num_boids, 2), dtype=self.dtype)
         else:
-            raise ValueError('`boundary_behaviour` value should be either'
+            raise ValueError('`boundary_behavior` value should be either'
                 ' `avoid` or `wrap`.')
 
         for i in range(self.num_boids):
@@ -96,9 +96,9 @@ class DynamicsModel:
         velocities = deepcopy(self.boids_velocities) + diff
         velocities = self._cut_off(velocities)
 
-        if self.boundary_behaviour == 'avoid':
+        if self.boundary_behavior == 'avoid':
             self.boids_positions += velocities
-        elif self.boundary_behaviour == 'wrap':
+        elif self.boundary_behavior == 'wrap':
             self.boids_positions = self._wrap_around(
                 self.boids_positions + velocities)
         self.boids_velocities = velocities
@@ -179,16 +179,16 @@ class DynamicsModel:
 
         x_index = int(vector[0]/self._block_size)
         if x_index == self._num_x_gird:
-            if self.boundary_behaviour == 'avoid':
+            if self.boundary_behavior == 'avoid':
                 x_index -= 1
-            elif self.boundary_behaviour == 'wrap':
+            elif self.boundary_behavior == 'wrap':
                 x_index = 0
 
         y_index = int(vector[1]/self._block_size)
         if y_index == self._num_y_gird:
-            if self.boundary_behaviour == 'avoid':
+            if self.boundary_behavior == 'avoid':
                 y_index -= 1
-            elif self.boundary_behaviour == 'wrap':
+            elif self.boundary_behavior == 'wrap':
                 y_index = 0
 
         return x_index + self._num_x_gird * y_index
@@ -223,7 +223,7 @@ class DynamicsModel:
         mx = self._num_x_gird - 1
         my = self._num_y_gird - 1
 
-        if self.boundary_behaviour == 'avoid':
+        if self.boundary_behavior == 'avoid':
             if ((vector[0] + pair[0]) < 0) or ((vector[1] + pair[1]) < 0):
                 return None
             elif ((vector[0] + pair[0]) > mx) or ((vector[1] + pair[1]) > my):
@@ -231,7 +231,7 @@ class DynamicsModel:
             else:
                 grid_vec = (vector[0] + pair[0], vector[1] + pair[1])
 
-        if self.boundary_behaviour == 'wrap':
+        if self.boundary_behavior == 'wrap':
             modulated = (
                 (vector[0] + pair[0]) % (mx+1), (vector[1] + pair[1]) % (my+1))
             grid_vec = (modulated[0], modulated[1])
