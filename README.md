@@ -150,7 +150,7 @@ implemented in a separate project since the block structure is not supported by
 the batch processing. Link to the project will be added here when it's ready.
 
 ## Sources
-General information about the Boids model is available in a
+General information about the Boids model is available in the corresponding
 [Wikipedia article](https://en.wikipedia.org/wiki/Boids).
 More details about the original model can be found from its inventor's
 [Boids page](https://www.red3d.com/cwr/boids/). The idea for trying out the
