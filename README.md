@@ -1,6 +1,15 @@
 # BlockBoids
 NumPy array based Boids simulation optimized with spatial tiling.
 
+<p align="middle">
+  <img src="./pics/frame_50.png" width="32%" />
+  <img src="./pics/frame_80.png" width="32%" />
+  <img src="./pics/frame_110.png" width="32%" />
+</p>
+
+Above: example frames from one simulation with each of them 30 time step ahead
+of the preceding one.
+
 ## Intro
 The Boids model is used for simulating the flocking behavior of birds and the
 name comes from the abbreviation of "bird-oid object" which refers to a
