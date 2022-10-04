@@ -144,10 +144,11 @@ The algorithm performs faster if the block size is reduced by making all the
 distance parameters smaller. This however weakens the flocking effect and makes
 it more likely that the boids are split into several smaller groups.
 
-One thing that we did not optimize is the loop over all boids. This gave us the
-idea to use PyTorch and GPU-based batch processing for this. It will be
-implemented in a separate project since the block structure is not supported by
-the batch processing. Link to the project will be added here when it's ready.
+One thing that we did not optimize is the loop over all boids. We thought that
+it would be interesting to do this with parallel processing on a GPU using
+PyTorch tensor batches. This will be implemented in a separate project since
+the block structure is not supported by the tensor based batch processing. Link
+to the project will be added here when it's ready.
 
 ## Sources
 General information about the Boids model is available in the corresponding
