@@ -146,9 +146,9 @@ it more likely that the boids are split into several smaller groups.
 
 One thing that we did not optimize is the loop over all boids. We thought that
 it would be interesting to do this with parallel processing on a GPU using
-PyTorch tensor batches. This will be implemented in a separate project since
-the block structure is not supported by the tensor based batch processing. Link
-to the project will be added here when it's ready.
+PyTorch tensors. This will be implemented in a separate project since the block
+structure is not supported by the tensor based batch processing. Link to the
+project will be added here when it's ready.
 
 ## Sources
 General information about the Boids model is available in the corresponding
