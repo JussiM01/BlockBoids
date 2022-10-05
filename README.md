@@ -1,6 +1,13 @@
 # BlockBoids
 NumPy array based Boids simulation optimized with spatial tiling.
 
+<p align="middle">
+  <img src="./pics/frame_1st.png" width="49%" />
+  <img src="./pics/frame_2nd.png" width="49%" />
+</p>
+
+The images above show two frames from the simulation.
+
 ## Intro
 The Boids model is used for simulating the flocking behavior of birds and the
 name comes from the abbreviation of "bird-oid object" which refers to a
@@ -9,16 +16,18 @@ cohesion and separation.
 
 These rules compare boids positions and velocities with the other boids and
 adjust the velocities based on the average differences. This is done inside a
-sphere of given distance radius for each boid. We use separate variables for
-the distances corresponding to each rule. Many sources use only two variables.
-One for the alignment and cohesion and another one for the separation.
+sphere of given distance radius for each boid. I use separate variables for
+the distances corresponding to each rule in the code. Many sources use only
+two variables (one for the alignment and cohesion and another one for the
+separation).
 
 #### Optimizations
-We use NumPy array based manipulations for computing each boid's position and
-velocity updates. Also, instead of using all the other boids in these
-computations, only the boids from the relevant rectangular areas are used. This
-is done by dividing the position space into rectangular tiles which we ended up
-naming to blocks. These blocks are squares whose side length is defined by
+The implementation uses NumPy array based manipulations for computing each
+boid's position and velocity updates. Also, instead of using all the other
+boids in these computations, only the boids from the relevant rectangular areas
+are used. This is done by dividing the position space into rectangular tiles
+which I decided to call blocks. These blocks are squares whose side length is
+defined by
 
 <p align="center">
   <i>
@@ -37,7 +46,7 @@ git clone https://github.com/JussiM01/BlockBoids
 cd BlockBoids/
 pip install -r requirements.txt
 ```
-We used Python 3.8 but the code probably works also with slightly earlier or
+I used Python 3.8 but the code probably works also with slightly earlier or
 later versions. It was tested only with a computer that has Ubuntu as the
 operating system. The animation is done with matplotlib and may need some
 tweaks on other operating systems.
@@ -123,10 +132,10 @@ python3 -m cProfile -m boids -nb 100 -r 123 -p -no
 ```
 
 ## Computation time comparison
-We run the profiling with a fixed random seed for a few different numbers of
-boids with and without the use of blocks. Without the blocks the computation
-time growth began to look quadratic whereas with them it was fairly linear.
-The exact time values will of course depend on the used hardware.
+I ran the profiling with a fixed random seed for a few different numbers of
+boids with and without the blocks. Without the blocks the computation time
+growth began to look quadratic whereas with them it was fairly linear. The
+exact time values will of course depend on the used hardware.
 
 <p align="middle">
   <img src="./pics/Figure_1.png" width="60%" />
@@ -135,27 +144,28 @@ The exact time values will of course depend on the used hardware.
 ## Closing thoughts
 Without the blocks the model compares each boid with all the other boids which
 explains the quadratic time growth. When the blocks are used the growth should
-be roughly linear provided that the average count of boids within each boid's
-relevant blocks stays close to a constant. If the size of the position space
-is kept the same this will be violated at some point when the total number of
-boids grows large enough.
+be roughly linear provided that the average count of the boids within each
+boid's relevant blocks stays close to a constant. If the size of the space
+dimensions are kept same this will be violated at some point when the total
+number of boids grows large enough.
 
-The algorithm performs faster if the block size is reduced by making all the
+The algorithm performs faster if the block size is reduced by scaling all the
 distance parameters smaller. This however weakens the flocking effect and makes
 it more likely that the boids are split into several smaller groups.
 
-One thing that we did not optimize is the loop over all boids. This gave us the
-idea to use PyTorch and GPU-based batch processing for this. It will be
-implemented in a separate project since the block structure is not supported by
-the batch processing. Link to the project will be added here when it's ready.
+One thing that I didn't optimize is the loop over all boids. I thought that
+it would be interesting to do this with parallel processing on a GPU with
+PyTorch tensors. This will be implemented in a separate project since the block
+structure is not supported by the tensor based batch processing. Link to the
+project will be added here when it's ready.
 
 ## Sources
-General information about the Boids model is available in the corresponding
+General information about the Boids model is available in a
 [Wikipedia article](https://en.wikipedia.org/wiki/Boids).
 More details about the original model can be found from its inventor's
 [Boids page](https://www.red3d.com/cwr/boids/). The idea for trying out the
 block structure came to us from a research oriented
 [blog post](https://adamprice.io/blog/boids.html). Before starting the project
-we search the net for a good pseudocode presentation of the basic Boids
-algorithm and found a very good one from a microcontroller course
-[exercise page](https://people.ece.cornell.edu/land/courses/ece4760/labs/s2021/Boids/Boids.html).
+I searched on the net for a good pseudocode presentation of the basic Boids
+algorithm and found a very good one from this microcontroller
+[lab exercise](https://people.ece.cornell.edu/land/courses/ece4760/labs/s2021/Boids/Boids.html) page.
