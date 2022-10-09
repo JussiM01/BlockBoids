@@ -134,8 +134,8 @@ The above example samples the velocities direction angles between the angles
 60.0 and 120.0 degrees with respect to the positive x-axis. Again the velocity
 vectors will be scaled to have the init_speed length.
 
-There are also minimum and maximum values for the boids velocities which will
-also overwrite the init_speed if its value is not in between them (boundaries
+There are also minimum and maximum values for the boids' velocities which will
+overwrite the init_speed if its value is not in between them (boundaries
 included). Their default values are 2.0 and 3.0. These can be changed as
 follows:
 ```
