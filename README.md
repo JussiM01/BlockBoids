@@ -98,6 +98,52 @@ later behavior use the boundary_behavior flag as follows:
 python3 -m boids -bb wrap
 ```
 
+#### Positions and velocities
+The boids' positions and velocities are initialized randomly. There are three
+types of ways to do this: fixed_speed, fixed_velocity and angle_range. The
+default is the fixed_speed. All these methods use init_x_margin and
+init_y_margin and init_speed for the boids' state initialization. The default
+values for these are 200.0, 200.0 and 2,5. These can be changed as follows:
+```
+python3 -m boids -ixm 100.0 -iym 50.0 -is 3.0
+```
+where the example command above sets the x-margin to 100.0, y-margin to 50.0
+and all boids speeds to 3.0. This means that the boids are initialized inside a
+box which stops at 100.0 units away from left and right canvas boundaries
+and similarly 50.0 units from the top and bottom. The directions of the boids'
+initial velocities are uniformly random but they all have the init_speed length.
+
+The fixed_velocity initialization sets all the boids' initial velocities to
+same value. This can be used as follows:
+```
+python3 -m boids -it fixed_velocity -idx 1.0 -idy 0.0
+```
+where the above example command sets all the boids' initial velocities
+x-components to 1.0 and y-components to 0.0. The directional vectors will be
+scaled to have init_speed length. Error will be thrown if the both components
+are simultaneously zeros.
+
+The angle_range initialization uses initial_angle and angle_width parameters.
+The boids' velocity direction angles are sampled from an uniform distribution
+where the mean is the initial_angle and the interval width is the angle_width.
+This can be set as follows:
+```
+python3 -m boids -it angle_range -ia 90.0 -aw 60.0
+```
+The above example samples the velocities direction angles between the angles
+60.0 and 120.0 degrees with respect to the positive x-axis. Again the velocity
+vectors will be scaled to have the init_speed length.
+
+There are also minimum and maximum values for the boids' velocities which will
+overwrite the init_speed if its value is not in between them (boundaries
+included). Their default values are 2.0 and 3.0. These can be changed as
+follows:
+```
+python3 -m boids -mis 1.0 -mas 4.0
+```
+In the example above the minimum speed is set to 1.0 and maximum speed is set
+to 4.0.
+
 #### Random seed
 For reproducibility purposes it is possible to use the random_seed flag as
 follows:
